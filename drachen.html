@@ -191,38 +191,197 @@ draw();
 </script>
 
 <!-- Quiz Section -->
-<div style="max-width: 800px; margin: 60px auto 40px; padding: 0 20px;">
+<style>
+.quiz-section {
+    max-width: 800px;
+    margin: 60px auto 40px;
+    padding: 0 20px;
+}
+
+.quiz-card {
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.quiz-canvas-container {
+    text-align: center;
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+.quiz-canvas-container canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.quiz-dimensions {
+    background: #f0f0f0;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.quiz-hint {
+    background: #fff9e6;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #666;
+}
+
+.quiz-answer-section {
+    margin: 20px 0;
+}
+
+.quiz-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.quiz-input-group label {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.quiz-input-group input {
+    padding: 10px;
+    font-size: 18px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    width: 150px;
+    max-width: 100%;
+}
+
+.quiz-btn {
+    padding: 12px 30px;
+    font-size: 18px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+}
+
+.quiz-btn:hover {
+    opacity: 0.9;
+}
+
+.quiz-btn-secondary {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+}
+
+.quiz-btn-success {
+    padding: 10px 25px;
+    font-size: 16px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+}
+
+.quiz-result {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.quiz-solution {
+    display: none;
+    background: #e7f3ff;
+    border-left: 4px solid #0050FF;
+    padding: 15px;
+    margin-top: 15px;
+    line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+    .quiz-card {
+        padding: 20px;
+    }
+    
+    .quiz-dimensions,
+    .quiz-hint {
+        font-size: 16px;
+    }
+    
+    .quiz-input-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .quiz-input-group input {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .quiz-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .quiz-btn-secondary,
+    .quiz-btn-success {
+        width: 100%;
+        max-width: 300px;
+        margin: 5px 0;
+    }
+}
+</style>
+
+<div class="quiz-section">
     <h2 style="color: #333; margin-bottom: 20px;">🧮 Quiz: Berechne die Fläche!</h2>
     
-    <div style="background: white; border: 2px solid #333; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <div style="text-align: center; margin: 20px 0;">
+    <div class="quiz-card">
+        <div class="quiz-canvas-container">
             <canvas id="drachen-quiz-canvas" width="300" height="200"></canvas>
         </div>
         
-        <div style="background: #f0f0f0; padding: 15px; border-radius: 4px; margin: 20px 0; font-size: 18px; line-height: 1.8;">
+        <div class="quiz-dimensions">
             <strong>Gegeben:</strong><br>
             Diagonale e = <span id="drachen-e">12</span> cm<br>
             Diagonale f = <span id="drachen-f">8</span> cm
         </div>
         
-        <div style="background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; font-style: italic; color: #666;">
+        <div class="quiz-hint">
             💡 Tipp: Die Formel für die Fläche eines Drachens lautet: A = (e × f) / 2
         </div>
         
-        <div style="margin: 20px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0; flex-wrap: wrap;">
-                <label for="drachen-answer" style="font-size: 18px; font-weight: bold;">Deine Antwort:</label>
-                <input type="number" id="drachen-answer" placeholder="z.B. 48" style="padding: 10px; font-size: 18px; border: 2px solid #333; border-radius: 4px; width: 150px;">
+        <div class="quiz-answer-section">
+            <div class="quiz-input-group">
+                <label for="drachen-answer">Deine Antwort:</label>
+                <input type="number" id="drachen-answer" placeholder="z.B. 48">
                 <span style="font-size: 18px;">cm²</span>
-                <button onclick="checkDrachenQuiz()" style="padding: 12px 30px; font-size: 18px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Prüfen</button>
+                <button onclick="checkDrachenQuiz()" class="quiz-btn">Prüfen</button>
             </div>
             
-            <div id="drachen-result" style="display: none; margin-top: 15px; padding: 15px; border-radius: 4px; font-size: 18px; font-weight: bold;"></div>
+            <div id="drachen-result" class="quiz-result"></div>
             
-            <button onclick="toggleDrachenSolution()" style="margin-top: 10px; padding: 10px 20px; font-size: 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Lösung anzeigen</button>
-            <button onclick="newDrachenProblem()" style="margin-top: 10px; margin-left: 10px; padding: 10px 25px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Neue Aufgabe</button>
+            <button onclick="toggleDrachenSolution()" class="quiz-btn-secondary">Lösung anzeigen</button>
+            <button onclick="newDrachenProblem()" class="quiz-btn-success">Neue Aufgabe</button>
             
-            <div id="drachen-solution" style="display: none; background: #e7f3ff; border-left: 4px solid #0050FF; padding: 15px; margin-top: 15px; line-height: 1.8;">
+            <div id="drachen-solution" class="quiz-solution">
                 <strong>Lösung:</strong><br>
                 A = (e × f) / 2<br>
                 A = (<span id="drachen-sol-e">12</span> cm × <span id="drachen-sol-f">8</span> cm) / 2<br>

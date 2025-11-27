@@ -23,20 +23,20 @@ const quizProblems = {
         { a: 16, h: 5, answer: 80 },
         { a: 12, h: 9, answer: 108 },
         { a: 25, h: 4, answer: 100 },
-        { a: 8, h: 10, answer: 80 }
+        { a: 10, h: 8, answer: 80 }
     ],
     
     rhombus: [
-        { e: 10, f: 14, answer: 70 },
-        { e: 8, f: 12, answer: 48 },
-        { e: 12, f: 10, answer: 60 },
-        { e: 16, f: 8, answer: 64 },
-        { e: 14, f: 12, answer: 84 },
-        { e: 6, f: 16, answer: 48 },
-        { e: 18, f: 10, answer: 90 },
-        { e: 10, f: 18, answer: 90 },
-        { e: 20, f: 6, answer: 60 },
-        { e: 12, f: 16, answer: 96 }
+        { a: 12, h: 8, answer: 96 },
+        { a: 10, h: 7, answer: 70 },
+        { a: 15, h: 6, answer: 90 },
+        { a: 14, h: 9, answer: 126 },
+        { a: 18, h: 5, answer: 90 },
+        { a: 16, h: 8, answer: 128 },
+        { a: 20, h: 6, answer: 120 },
+        { a: 12, h: 10, answer: 120 },
+        { a: 8, h: 6, answer: 48 },
+        { a: 25, h: 4, answer: 100 }
     ]
 };
 

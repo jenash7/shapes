@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rhombus – Zerlegung wie GeoGebra</title>
 <link rel="stylesheet" href="shared.css">
 <script src="quiz-data.js"></script>
@@ -28,25 +29,21 @@ const ctx = canvas.getContext("2d");
 const slider = document.getElementById("slider");
 
 // === RHOMBUS PARAMETER ===
-const a = 240;                   // Seitenlänge (alle Seiten gleich)
-const angleDeg = 125;            // Innenwinkel an A
-const angle = angleDeg * Math.PI / 180;
+const a = 180;                   // Seitenlänge (alle Seiten gleich)
+const h = 120;                   // Höhe des Rhombus
+const dx = Math.sqrt(a*a - h*h);  // Horizontale Verschiebung für gleiche Seitenlängen
 
-const A = {x: 250, y: 150};
-const B = {x: A.x + a, y: A.y};
+// Position und Punkte mit horizontalen Top/Bottom
+const offsetX = 250;
+const offsetY = 150;
 
-// Weitere Punkte des Rhombus
-const C = {
-    x: B.x + a * Math.cos(angle),
-    y: B.y + a * Math.sin(angle)
-};
-const D = {
-    x: A.x + a * Math.cos(angle),
-    y: A.y + a * Math.sin(angle)
-};
+// Berechne horizontale Verschiebung für gleiche Seitenlängen
+const halfWidth = Math.sqrt(a*a - h*h);
 
-// Höhe des Rhombus (vertikal)
-const h = Math.abs(A.y - D.y);
+const A = {x: offsetX, y: offsetY};
+const B = {x: offsetX + a, y: offsetY};
+const C = {x: offsetX + a - dx, y: offsetY + h};
+const D = {x: offsetX - dx, y: offsetY + h};
 
 function draw() {
     ctx.clearRect(0,0,900,450);
@@ -153,43 +150,201 @@ draw();
 </script>
 
 <!-- Quiz Section -->
-<div style="max-width: 800px; margin: 60px auto 40px; padding: 0 20px;">
+<style>
+.quiz-section {
+    max-width: 800px;
+    margin: 60px auto 40px;
+    padding: 0 20px;
+}
+
+.quiz-card {
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.quiz-canvas-container {
+    text-align: center;
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+.quiz-canvas-container canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.quiz-dimensions {
+    background: #f0f0f0;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.quiz-hint {
+    background: #fff9e6;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #666;
+}
+
+.quiz-answer-section {
+    margin: 20px 0;
+}
+
+.quiz-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+}
+
+.quiz-input-group label {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.quiz-input-group input {
+    padding: 10px;
+    font-size: 18px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    width: 150px;
+    max-width: 100%;
+}
+
+.quiz-btn {
+    padding: 12px 30px;
+    font-size: 18px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+}
+
+.quiz-btn:hover {
+    opacity: 0.9;
+}
+
+.quiz-btn-secondary {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+}
+
+.quiz-btn-success {
+    padding: 10px 25px;
+    font-size: 16px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+}
+
+.quiz-result {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.quiz-solution {
+    display: none;
+    background: #e7f3ff;
+    border-left: 4px solid #0050FF;
+    padding: 15px;
+    margin-top: 15px;
+    line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+    .quiz-card {
+        padding: 20px;
+    }
+    
+    .quiz-dimensions,
+    .quiz-hint {
+        font-size: 16px;
+    }
+    
+    .quiz-input-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .quiz-input-group input {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .quiz-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .quiz-btn-secondary,
+    .quiz-btn-success {
+        width: 100%;
+        max-width: 300px;
+        margin: 5px 0;
+    }
+}
+</style>
+
+<div class="quiz-section">
     <h2 style="color: #333; margin-bottom: 20px;">🧮 Quiz: Berechne die Fläche!</h2>
     
-    <div style="background: white; border: 2px solid #333; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <div style="text-align: center; margin: 20px 0;">
+    <div class="quiz-card">
+        <div class="quiz-canvas-container">
             <canvas id="rhombus-quiz-canvas" width="300" height="200"></canvas>
         </div>
         
-        <div style="background: #f0f0f0; padding: 15px; border-radius: 4px; margin: 20px 0; font-size: 18px; line-height: 1.8;">
+        <div class="quiz-dimensions">
             <strong>Gegeben:</strong><br>
-            Diagonale e = <span id="rhombus-e">10</span> cm<br>
-            Diagonale f = <span id="rhombus-f">14</span> cm
+            Seitenlänge a = <span id="rhombus-a">12</span> cm<br>
+            Höhe h = <span id="rhombus-h">8</span> cm
         </div>
         
-        <div style="background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; font-style: italic; color: #666;">
-            💡 Tipp: Die Formel für die Fläche eines Rhombus lautet: A = (e × f) / 2
+        <div class="quiz-hint">
+            💡 Tipp: Die Formel für die Fläche eines Rhombus lautet: A = a × h
         </div>
         
-        <div style="margin: 20px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0; flex-wrap: wrap;">
-                <label for="rhombus-answer" style="font-size: 18px; font-weight: bold;">Deine Antwort:</label>
-                <input type="number" id="rhombus-answer" placeholder="z.B. 70" style="padding: 10px; font-size: 18px; border: 2px solid #333; border-radius: 4px; width: 150px;">
+        <div class="quiz-answer-section">
+            <div class="quiz-input-group">
+                <label for="rhombus-answer">Deine Antwort:</label>
+                <input type="number" id="rhombus-answer" placeholder="z.B. 96">
                 <span style="font-size: 18px;">cm²</span>
-                <button onclick="checkRhombusQuiz()" style="padding: 12px 30px; font-size: 18px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Prüfen</button>
+                <button onclick="checkRhombusQuiz()" class="quiz-btn">Prüfen</button>
             </div>
             
-            <div id="rhombus-result" style="display: none; margin-top: 15px; padding: 15px; border-radius: 4px; font-size: 18px; font-weight: bold;"></div>
+            <div id="rhombus-result" class="quiz-result"></div>
             
-            <button onclick="toggleRhombusSolution()" style="margin-top: 10px; padding: 10px 20px; font-size: 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Lösung anzeigen</button>
-            <button onclick="newRhombusProblem()" style="margin-top: 10px; margin-left: 10px; padding: 10px 25px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Neue Aufgabe</button>
+            <button onclick="toggleRhombusSolution()" class="quiz-btn-secondary">Lösung anzeigen</button>
+            <button onclick="newRhombusProblem()" class="quiz-btn-success">Neue Aufgabe</button>
             
-            <div id="rhombus-solution" style="display: none; background: #e7f3ff; border-left: 4px solid #0050FF; padding: 15px; margin-top: 15px; line-height: 1.8;">
+            <div id="rhombus-solution" class="quiz-solution">
                 <strong>Lösung:</strong><br>
-                A = (e × f) / 2<br>
-                A = (<span id="rhombus-sol-e">10</span> cm × <span id="rhombus-sol-f">14</span> cm) / 2<br>
-                A = <span id="rhombus-sol-product">140</span> cm² / 2<br>
-                A = <strong><span id="rhombus-sol-answer">70</span> cm²</strong>
+                A = a × h<br>
+                A = <span id="rhombus-sol-a">12</span> cm × <span id="rhombus-sol-h">8</span> cm<br>
+                A = <strong><span id="rhombus-sol-answer">96</span> cm²</strong>
             </div>
         </div>
     </div>
@@ -206,53 +361,59 @@ function drawRhombusQuiz() {
     
     const problem = getCurrentProblem('rhombus');
     const scaleFactor = 10;
-    const e = problem.e * scaleFactor;
-    const f = problem.f * scaleFactor;
-    const x = 150, y = 100;
+    const a = problem.a * scaleFactor;
+    const h = problem.h * scaleFactor;
+    const dx = Math.sqrt(a*a - h*h);  // Horizontale Verschiebung für gleiche Seitenlängen
     
-    // Draw shape
+    const offsetX = 150;
+    const offsetY = 50;
+    
+    // Draw rhombus with horizontal top/bottom (matching main animation)
+    const A = {x: offsetX, y: offsetY};
+    const B = {x: offsetX + a, y: offsetY};
+    const C = {x: offsetX + a - dx, y: offsetY + h};
+    const D = {x: offsetX - dx, y: offsetY + h};
+    
     ctx.fillStyle = '#ADD8FF';
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(x, y - f/2);
-    ctx.lineTo(x + e/2, y);
-    ctx.lineTo(x, y + f/2);
-    ctx.lineTo(x - e/2, y);
+    ctx.moveTo(A.x, A.y);
+    ctx.lineTo(B.x, B.y);
+    ctx.lineTo(C.x, C.y);
+    ctx.lineTo(D.x, D.y);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
     
-    // Draw dashed diagonal lines
+    // Draw dashed height line
     ctx.strokeStyle = '#666';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([5, 5]);
-    // Horizontal diagonal (e)
     ctx.beginPath();
-    ctx.moveTo(x - e/2, y);
-    ctx.lineTo(x + e/2, y);
+    ctx.moveTo(A.x, A.y);
+    ctx.lineTo(A.x, A.y + h);
     ctx.stroke();
-    // Vertical diagonal (f)
+    // Draw dashed baseline
     ctx.beginPath();
-    ctx.moveTo(x, y - f/2);
-    ctx.lineTo(x, y + f/2);
+    ctx.moveTo(D.x, D.y);
+    ctx.lineTo(A.x, A.y + h);
     ctx.stroke();
     ctx.setLineDash([]);
     
     // Labels
     ctx.font = '16px Arial';
     ctx.fillStyle = '#333';
-    ctx.fillText('e = ' + problem.e + ' cm', x - 35, y + f/2 + 25);
-    ctx.fillText('f = ' + problem.f + ' cm', x + e/2 + 10, y);
+    ctx.fillText('a = ' + problem.a + ' cm', (A.x + B.x) / 2 - 30, A.y - 10);
+    ctx.fillText('h = ' + problem.h + ' cm', A.x - 50, A.y + h / 2);
 }
 
 function updateRhombusQuizDisplay() {
     const problem = getCurrentProblem('rhombus');
-    document.getElementById('rhombus-e').textContent = problem.e;
-    document.getElementById('rhombus-f').textContent = problem.f;
-    document.getElementById('rhombus-sol-e').textContent = problem.e;
-    document.getElementById('rhombus-sol-f').textContent = problem.f;
-    document.getElementById('rhombus-sol-product').textContent = problem.e * problem.f;
+    document.getElementById('rhombus-a').textContent = problem.a;
+    document.getElementById('rhombus-h').textContent = problem.h;
+    document.getElementById('rhombus-sol-a').textContent = problem.a;
+    document.getElementById('rhombus-sol-h').textContent = problem.h;
     document.getElementById('rhombus-sol-answer').textContent = problem.answer;
     drawRhombusQuiz();
 }
