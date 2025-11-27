@@ -163,4 +163,4 @@ git branch -d branch-name
 
 ---
 
-**Tipp**: Diese Datei kannst du jederzeit mit `cat ANLEITUNG.md` im Terminal lesen! 📖
+**Tipp**: Diese Datei kannst du jederzeit mit `cat README.md` im Terminal lesen! 📖
