@@ -1,3 +1,8 @@
+// Farben
+const lightBlue = "#ADD8FF";
+const darkBlue = "#0050FF";
+const darkGrey = "#333";
+
 // Common canvas utilities
 function makeCanvasResponsive(canvasId, draw, maxWidth = 900) {
     const canvas = document.getElementById(canvasId);
@@ -20,6 +25,50 @@ function makeCanvasResponsive(canvasId, draw, maxWidth = 900) {
     resizeCanvas();
     
     return { canvas, ctx, resizeCanvas };
+}
+
+// Canvas drawing utilities
+function drawText(ctx, x, y, text, scale = 1, color = "black", baseFontSize = 20) {
+    const fontSize = Math.max(12, baseFontSize * scale);
+    ctx.font = fontSize + "px Arial";
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+}
+
+function drawRectangle(ctx, x, y, width, height, fillColor = "rgba(0,0,0,0)", lineColor = "black", dash = []) {
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = lineColor;
+    ctx.setLineDash(dash);
+    ctx.beginPath();
+    ctx.rect(x, y, width, height);
+    ctx.fill();
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+function drawLine(ctx, x1, y1, x2, y2, color, dash = [], lineWidth = 2) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.setLineDash(dash);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+function drawPolygon(ctx, points, fillColor, lineColor = "#333", lineWidth = 2) {
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
 }
 
 // Common quiz canvas utilities

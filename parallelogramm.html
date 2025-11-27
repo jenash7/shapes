@@ -92,11 +92,11 @@ function draw() {
     if (t < moveStart) {
         ctx.fillText("b", A.x - 70, (A.y+D.y)/2);
         ctx.fillStyle = "#ADD8FF";
-        drawPolygon([A,B,C,D]);
+        drawPolygon(ctx, [A,B,C,D]);
     } else {
         ctx.fillStyle = "#ADD8FF";
 	const A_new = {x: A.x, y: A.y + h};
-	drawPolygon([A, B, C, A_new]);
+	drawPolygon(ctx, [A, B, C, A_new]);
     }
    
 
@@ -106,19 +106,11 @@ function draw() {
     // 3) Linkes Dreieck farbig markieren (aber nur bis es bewegt wird)
     if (t >= colorStart && t < moveStart) {
         ctx.fillStyle = "#5B8BFF";
-        drawPolygon([T1,T2,T3]);
+        drawPolygon(ctx, [T1,T2,T3]);
     }
     if (t >= heightStart) {
-        ctx.beginPath();
-        ctx.moveTo(A.x, A.y);
-        ctx.lineTo(A.x, A.y + h);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.font = fontSize + "px Arial";
-	ctx.fillStyle = "black";
-
-        ctx.fillText("h", A.x - 20 * scale, A.y + h/2);
+        drawLine(ctx, A.x, A.y, A.x, A.y + h, "black");
+        drawText(ctx, A.x - 20 * scale, A.y + h/2, "h", scale, "black");
     }
     // 4) Dreieck verschieben
     if (t >= moveStart) {
@@ -129,7 +121,7 @@ function draw() {
         const dy = (B.y - A.y) * moveT;
 
         ctx.fillStyle = "#5B8BFF";
-        drawPolygon([
+        drawPolygon(ctx, [
             {x:T1.x + dx, y:T1.y + dy},
             {x:T2.x + dx, y:T2.y + dy},
             {x:T3.x + dx, y:T3.y + dy}
@@ -138,21 +130,8 @@ function draw() {
 
     // 5) Endzustand: Rechteck
     if (t >= endStart) {
-        ctx.font = "26px Arial";
-        ctx.fillStyle = "green";
-        ctx.fillText("→ Rechteck", B.x + 40, A.y + 10);
+        drawText(ctx, B.x + 40, A.y + 10, "→ Rechteck", scale, "green", 26);
     }
-}
-
-function drawPolygon(pts) {
-    ctx.strokeStyle = "#333";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (const p of pts.slice(1)) ctx.lineTo(p.x, p.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
 }
 
 slider.oninput = draw;

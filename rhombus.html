@@ -106,16 +106,16 @@ function draw() {
     ctx.fillStyle = "#ADD8FF";
 
     if (t < moveStart) {
-        drawPolygon([A,B,C,D]);
+        drawPolygon(ctx, [A,B,C,D]);
     } else {
         const A_new = {x: A.x, y: A.y + h};
-        drawPolygon([A, B, C, A_new]);
+        drawPolygon(ctx, [A, B, C, A_new]);
     }
 
     // ========= 2) Farbiges Dreieck vor der Bewegung =========
     if (t >= colorStart && t < moveStart) {
         ctx.fillStyle = "#5B8BFF";
-        drawPolygon([T1,T2,T3]);
+        drawPolygon(ctx, [T1,T2,T3]);
     }
 
     // ========= 3) Dreieck verschieben =========
@@ -127,7 +127,7 @@ function draw() {
         moveDy = (B.y - A.y) * moveT;
 
         ctx.fillStyle = "#5B8BFF";
-        drawPolygon([
+        drawPolygon(ctx, [
             {x:T1.x + moveDx, y:T1.y + moveDy},
             {x:T2.x + moveDx, y:T2.y + moveDy},
             {x:T3.x + moveDx, y:T3.y + moveDy}
@@ -136,43 +136,19 @@ function draw() {
 
     // ========= 4) Höhe + h-Beschriftung (IMMER GANZ OBEN!) =========
     if (t >= heightStart) {
-
         // Höhe-Linie
-        ctx.beginPath();
-        ctx.moveTo(A.x + moveDx, A.y + moveDy);
-        ctx.lineTo(A.x + moveDx, A.y + h + moveDy);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
+        drawLine(ctx, A.x + moveDx, A.y + moveDy, A.x + moveDx, A.y + h + moveDy, "black");
+        
         // h Position — bewegt sich mit dem Dreieck
         const hx = A.x + moveDx - 20 * scale;
         const hy = A.y + moveDy + h/2;
-
-        ctx.fillStyle = "black";
-        const fontSize = Math.max(12, 20 * scale);
-        ctx.font = fontSize + "px Arial";
-        ctx.fillText("h", hx, hy);
+        drawText(ctx, hx, hy, "h", scale, "black");
     }
 
     // ========= 5) Endbeschriftung =========
     if (t >= endStart) {
-        const fontSize = Math.max(16, 26 * scale);
-        ctx.font = fontSize + "px Arial";
-        ctx.fillStyle = "green";
-        ctx.fillText("→ Rechteck", B.x + 40 * scale, A.y + 10 * scale);
+        drawText(ctx, B.x + 40 * scale, A.y + 10 * scale, "→ Rechteck", scale, "green", 26);
     }
-}
-
-function drawPolygon(pts) {
-    ctx.strokeStyle = "#333";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (const p of pts.slice(1)) ctx.lineTo(p.x, p.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
 }
 
 slider.oninput = draw;
@@ -253,39 +229,15 @@ function drawRhombusQuiz() {
     const C = {x: offsetX + a - dx, y: offsetY + h};
     const D = {x: offsetX - dx, y: offsetY + h};
     
-    ctx.fillStyle = '#ADD8FF';
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(A.x, A.y);
-    ctx.lineTo(B.x, B.y);
-    ctx.lineTo(C.x, C.y);
-    ctx.lineTo(D.x, D.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    drawPolygon(ctx, [A, B, C, D], lightBlue);
     
-    // Draw dashed height line
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(A.x, A.y);
-    ctx.lineTo(A.x, A.y + h);
-    ctx.stroke();
-    // Draw dashed baseline
-    ctx.beginPath();
-    ctx.moveTo(D.x, D.y);
-    ctx.lineTo(A.x, A.y + h);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    // Draw dashed height and base line
+    drawLine(ctx, A.x, A.y, A.x, A.y + h, darkGrey, [5, 5]);
+    drawLine(ctx, D.x, D.y, A.x, A.y + h, darkGrey, [5, 5]);
     
     // Labels
-    const fontSize = Math.max(12, 16 * scale);
-    ctx.font = fontSize + 'px Arial';
-    ctx.fillStyle = '#333';
-    ctx.fillText('a = ' + problem.a + ' cm', (A.x + B.x) / 2 - 30 * scale, A.y - 10 * scale);
-    ctx.fillText('h = ' + problem.h + ' cm', A.x - 50 * scale, A.y + h / 2);
+    drawText(ctx, (A.x + B.x) / 2 - 30 * scale, A.y - 10 * scale, 'a = ' + problem.a + ' cm');
+    drawText(ctx, A.x - 50 * scale, A.y + h / 2, 'h = ' + problem.h + ' cm');
 }
 
 function updateRhombusQuizDisplay() {

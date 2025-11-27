@@ -38,10 +38,6 @@ const baseRatio = 0.75;
 const baseX0 = 250;
 const baseY0 = 150;
 
-// Farben
-const lightBlue = "#ADD8FF";
-const darkBlue = "#0050FF";
-
 const padding = 10; // Abstand für Text
 
 function getScaleFactor() {
@@ -94,16 +90,16 @@ function draw() {
     const endStart = 0.80;     // Rechteck-Text erscheint
 
     // Grundform
-    drawPolygon([A, C, D], lightBlue); // obere Hälfte immer zeichnen
+    drawPolygon(ctx, [A, C, D], lightBlue); // obere Hälfte immer zeichnen
     if (t < colorStart) {
-        drawPolygon([A, B, C], lightBlue); // untere Hälfte nur bis Spiegelung
+        drawPolygon(ctx, [A, B, C], lightBlue); // untere Hälfte nur bis Spiegelung
     }
     
     // Hilfslinien einblenden / verblassen
-    drawLine(A.x, A.y, C.x, C.y, `rgba(0,0,0,${1-t})`);
-    drawLine(B.x, B.y, D.x, D.y, `rgba(0,0,0,${1-t})`);
+    drawLine(ctx, A.x, A.y, C.x, C.y, `rgba(0,0,0,${1-t})`);
+    drawLine(ctx, B.x, B.y, D.x, D.y, `rgba(0,0,0,${1-t})`);
     if (t >= heightStart) {
-        drawRectangle(x0, y0, e, f, "transparent", `rgba(0,0,0,${t})`, [5, 5]);
+        drawRectangle(ctx, x0, y0, e, f, "transparent", `rgba(0,0,0,${t})`, [5, 5]);
     }
 
     // Höhe Text verschieben
@@ -120,14 +116,14 @@ function draw() {
             fStart[0] + (fStop[0] - fStart[0]) * Math.min((t - heightStart) / (colorStart - heightStart), 1),
             fStart[1] + (fStop[1] - fStart[1]) * Math.min((t - heightStart) / (colorStart - heightStart), 1)
         ];
-        addText(ePos[0], ePos[1], "e");
-        addText(fPos[0], fPos[1], "f");
+        drawText(ctx, ePos[0], ePos[1], "e", scale);
+        drawText(ctx, fPos[0], fPos[1], "f", scale);
     }
     
     // Dreiecke farbig markieren (aber nur bis es bewegt wird)
     if (t >= colorStart && t < mirrorStart) {
-        drawPolygon([A, E, B], darkBlue);
-        drawPolygon([C, E, B], darkBlue);
+        drawPolygon(ctx, [A, E, B], darkBlue);
+        drawPolygon(ctx, [C, E, B], darkBlue);
     }
 
     // Dreiecke spiegeln 
@@ -137,14 +133,14 @@ function draw() {
         const dx2 = (C.x - E.x) * mirrorT; // Spiegelungspfad rechtes Dreieck
 
         // linkes Dreieck
-        drawPolygon([
+        drawPolygon(ctx, [
             {x: A.x + dx1, y: A.y},
             {x: E.x - dx1, y: E.y},
             {x: B.x - dx1, y: B.y}
         ], darkBlue);
 
         // rechtes Dreieck
-        drawPolygon([
+        drawPolygon(ctx, [
             {x: C.x - dx2, y: C.y},
             {x: E.x + dx2, y: E.y},
             {x: B.x + dx2, y: B.y}
@@ -157,14 +153,14 @@ function draw() {
         const dy = (f/2) * moveT;
 
         // linkes Dreieck
-        drawPolygon([
+        drawPolygon(ctx, [
             {x: A.x, y: A.y - dy},
             {x: E.x, y: E.y - dy},
             {x: A.x, y: B.y - dy}
         ], darkBlue);
 
         // rechtes Dreieck
-        drawPolygon([
+        drawPolygon(ctx, [
             {x: C.x, y: C.y - dy},
             {x: E.x, y: E.y - dy},
             {x: C.x, y: B.y - dy}
@@ -173,51 +169,8 @@ function draw() {
 
     // Endzustand: Rechteck
     if (t >= endStart) {
-        const fontSize = Math.max(16, 26 * scale);
-        ctx.font = fontSize + "px Arial";
-        ctx.fillStyle = "green";
-        ctx.fillText("→ Rechteck", x0 + e + 40 * scale, y0 + 10 * scale);
+        drawText(ctx, x0 + e + 40 * scale, y0 + 10 * scale, "→ Rechteck", scale, "green", 26);
     }
-}
-
-function addText(x, y, text, color="black", fontSizeBase="20px Arial") {
-    const scale = getScaleFactor();
-    const fontSize = Math.max(12, 20 * scale);
-    ctx.font = fontSize + "px Arial";
-    ctx.fillStyle = color;
-    ctx.fillText(text, x, y);
-}
-
-function drawRectangle(x0, y0, width, height, fillColor = "rgba(0,0,0,0)", lineColor = "black", dash = []) {
-    ctx.fillStyle = fillColor;
-    ctx.setLineDash(dash);
-    ctx.beginPath();
-    ctx.rect(x0, y0, width, height);
-    ctx.fill();
-    ctx.strokeStyle = lineColor;
-    ctx.stroke();
-    ctx.setLineDash([]);
-}
-
-function drawLine(x1, y1, x2, y2, color, dash = []) {
-    ctx.strokeStyle = color;
-    ctx.setLineDash(dash);
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-}
-
-function drawPolygon(pts, fillColor, lineColor = "black") {
-    ctx.fillStyle = fillColor;
-    ctx.strokeStyle = lineColor;
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (const p of pts.slice(1)) ctx.lineTo(p.x, p.y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
 }
 
 slider.oninput = draw;
