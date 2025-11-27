@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Flächen-Quiz</title>
+<link rel="stylesheet" href="shared.css">
+<script src="quiz-data.js"></script>
+<style>
+    .quiz-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .quiz-card {
+        background: white;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .quiz-card h3 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 24px;
+    }
+    
+    .shape-visual {
+        margin: 20px 0;
+        text-align: center;
+    }
+    
+    .shape-visual canvas {
+        border: 2px solid #333;
+        background: white;
+        border-radius: 4px;
+        max-width: 100%;
+    }
+    
+    .dimensions {
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 20px 0;
+        font-size: 18px;
+        line-height: 1.8;
+    }
+    
+    .formula-hint {
+        background: #fff9e6;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        font-style: italic;
+        color: #666;
+    }
+    
+    .answer-section {
+        margin: 20px 0;
+    }
+    
+    .answer-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 15px 0;
+        flex-wrap: wrap;
+    }
+    
+    .answer-input label {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    .answer-input input {
+        padding: 10px;
+        font-size: 18px;
+        border: 2px solid #333;
+        border-radius: 4px;
+        width: 150px;
+    }
+    
+    .answer-input input:focus {
+        outline: none;
+        border-color: #0050FF;
+    }
+    
+    .check-button {
+        padding: 12px 30px;
+        font-size: 18px;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .check-button:hover {
+        background: #555;
+    }
+    
+    .check-button:active {
+        transform: scale(0.98);
+    }
+    
+    .result {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 4px;
+        font-size: 18px;
+        font-weight: bold;
+        display: none;
+    }
+    
+    .result.correct {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #28a745;
+        display: block;
+    }
+    
+    .result.incorrect {
+        background: #f8d7da;
+        color: #721c24;
+        border: 2px solid #dc3545;
+        display: block;
+    }
+    
+    .show-solution {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .show-solution:hover {
+        background: #5a6268;
+    }
+    
+    .solution {
+        display: none;
+        background: #e7f3ff;
+        border-left: 4px solid #0050FF;
+        padding: 15px;
+        margin-top: 15px;
+        line-height: 1.8;
+    }
+    
+    .solution.visible {
+        display: block;
+    }
+    
+    .new-problem-button {
+        padding: 10px 25px;
+        font-size: 16px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background 0.3s;
+    }
+    
+    .new-problem-button:hover {
+        background: #218838;
+    }
+    
+    .new-problem-button:active {
+        transform: scale(0.98);
+    }
+</style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html">← Zurück zur Übersicht</a>
+    <a href="drachen.html">Drachen</a>
+    <a href="parallelogramm.html">Parallelogramm</a>
+    <a href="rhombus.html">Rhombus</a>
+    <a href="quiz.html" class="active">Quiz</a>
+</nav>
+
+<h1>Flächen-Quiz</h1>
+<p class="intro" style="max-width: 800px; margin: 0 auto 40px; color: #555;">
+    Berechne die Flächen der folgenden Formen. Gib deine Antwort ein und überprüfe, ob du richtig gerechnet hast!
+</p>
+
+<div class="quiz-container">
+    <!-- Drachen Quiz -->
+    <div class="quiz-card">
+        <h3>🪁 Aufgabe 1: Drachen</h3>
+        
+        <div class="shape-visual">
+            <canvas id="drachen-canvas" width="300" height="200"></canvas>
+        </div>
+        
+        <div class="dimensions">
+            <strong>Gegeben:</strong><br>
+            Diagonale e = <span id="drachen-e">12</span> cm<br>
+            Diagonale f = <span id="drachen-f">8</span> cm
+        </div>
+        
+        <div class="formula-hint">
+            💡 Tipp: Die Formel für die Fläche eines Drachens lautet: A = (e × f) / 2
+        </div>
+        
+        <div class="answer-section">
+            <div class="answer-input">
+                <label for="drachen-answer">Deine Antwort:</label>
+                <input type="number" id="drachen-answer" placeholder="z.B. 48">
+                <span style="font-size: 18px;">cm²</span>
+                <button class="check-button" onclick="checkDrachen()">Prüfen</button>
+            </div>
+            
+            <div id="drachen-result" class="result"></div>
+            <button class="show-solution" onclick="toggleSolution('drachen')">Lösung anzeigen</button>
+            <button class="new-problem-button" onclick="newProblem('drachen')">Neue Aufgabe</button>
+            <div id="drachen-solution" class="solution">
+                <strong>Lösung:</strong><br>
+                A = (e × f) / 2<br>
+                A = (<span id="drachen-sol-e">12</span> cm × <span id="drachen-sol-f">8</span> cm) / 2<br>
+                A = <span id="drachen-sol-product">96</span> cm² / 2<br>
+                A = <strong><span id="drachen-sol-answer">48</span> cm²</strong>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Parallelogramm Quiz -->
+    <div class="quiz-card">
+        <h3>▱ Aufgabe 2: Parallelogramm</h3>
+        
+        <div class="shape-visual">
+            <canvas id="parallelogramm-canvas" width="300" height="200"></canvas>
+        </div>
+        
+        <div class="dimensions">
+            <strong>Gegeben:</strong><br>
+            Grundseite a = <span id="parallelogramm-a">15</span> cm<br>
+            Höhe h = <span id="parallelogramm-h">6</span> cm
+        </div>
+        
+        <div class="formula-hint">
+            💡 Tipp: Die Formel für die Fläche eines Parallelogramms lautet: A = a × h
+        </div>
+        
+        <div class="answer-section">
+            <div class="answer-input">
+                <label for="parallelogramm-answer">Deine Antwort:</label>
+                <input type="number" id="parallelogramm-answer" placeholder="z.B. 90">
+                <span style="font-size: 18px;">cm²</span>
+                <button class="check-button" onclick="checkParallelogramm()">Prüfen</button>
+            </div>
+            
+            <div id="parallelogramm-result" class="result"></div>
+            <button class="show-solution" onclick="toggleSolution('parallelogramm')">Lösung anzeigen</button>
+            <button class="new-problem-button" onclick="newProblem('parallelogramm')">Neue Aufgabe</button>
+            <div id="parallelogramm-solution" class="solution">
+                <strong>Lösung:</strong><br>
+                A = a × h<br>
+                A = <span id="parallelogramm-sol-a">15</span> cm × <span id="parallelogramm-sol-h">6</span> cm<br>
+                A = <strong><span id="parallelogramm-sol-answer">90</span> cm²</strong>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Rhombus Quiz -->
+    <div class="quiz-card">
+        <h3>◆ Aufgabe 3: Rhombus</h3>
+        
+        <div class="shape-visual">
+            <canvas id="rhombus-canvas" width="300" height="200"></canvas>
+        </div>
+        
+        <div class="dimensions">
+            <strong>Gegeben:</strong><br>
+            Diagonale e = <span id="rhombus-e">10</span> cm<br>
+            Diagonale f = <span id="rhombus-f">14</span> cm
+        </div>
+        
+        <div class="formula-hint">
+            💡 Tipp: Die Formel für die Fläche eines Rhombus lautet: A = (e × f) / 2
+        </div>
+        
+        <div class="answer-section">
+            <div class="answer-input">
+                <label for="rhombus-answer">Deine Antwort:</label>
+                <input type="number" id="rhombus-answer" placeholder="z.B. 70">
+                <span style="font-size: 18px;">cm²</span>
+                <button class="check-button" onclick="checkRhombus()">Prüfen</button>
+            </div>
+            
+            <div id="rhombus-result" class="result"></div>
+            <button class="show-solution" onclick="toggleSolution('rhombus')">Lösung anzeigen</button>
+            <button class="new-problem-button" onclick="newProblem('rhombus')">Neue Aufgabe</button>
+            <div id="rhombus-solution" class="solution">
+                <strong>Lösung:</strong><br>
+                A = (e × f) / 2<br>
+                A = (<span id="rhombus-sol-e">10</span> cm × <span id="rhombus-sol-f">14</span> cm) / 2<br>
+                A = <span id="rhombus-sol-product">140</span> cm² / 2<br>
+                A = <strong><span id="rhombus-sol-answer">70</span> cm²</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Draw Drachen
+function drawDrachen() {
+    const canvas = document.getElementById('drachen-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const problem = getCurrentProblem('drachen');
+    const scaleFactor = 10;
+    const e = problem.e * scaleFactor;
+    const f = problem.f * scaleFactor;
+    const x = 150, y = 100;
+    
+    // Draw shape
+    ctx.fillStyle = '#ADD8FF';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y - f/2);
+    ctx.lineTo(x + e*0.6, y);
+    ctx.lineTo(x, y + f/2);
+    ctx.lineTo(x - e*0.4, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    
+    // Draw dashed diagonal lines
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    // Horizontal diagonal (e)
+    ctx.beginPath();
+    ctx.moveTo(x - e*0.4, y);
+    ctx.lineTo(x + e*0.6, y);
+    ctx.stroke();
+    // Vertical diagonal (f)
+    ctx.beginPath();
+    ctx.moveTo(x, y - f/2);
+    ctx.lineTo(x, y + f/2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Labels
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('e = ' + problem.e + ' cm', x - 30, y + f/2 + 25);
+    ctx.fillText('f = ' + problem.f + ' cm', x + e*0.6 + 10, y);
+}
+
+// Draw Parallelogramm
+function drawParallelogramm() {
+    const canvas = document.getElementById('parallelogramm-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const problem = getCurrentProblem('parallelogramm');
+    const scaleFactor = 10;
+    const a = problem.a * scaleFactor;
+    const h = problem.h * scaleFactor;
+    const skew = 30;
+    const x = 75, y = 70;
+    
+    // Draw shape
+    ctx.fillStyle = '#ADD8FF';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + a, y);
+    ctx.lineTo(x + a - skew, y + h);
+    ctx.lineTo(x - skew, y + h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    
+    // Draw dashed height line
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + h);
+    ctx.stroke();
+    // Draw dashed baseline extension
+    ctx.beginPath();
+    ctx.moveTo(x - skew, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Labels
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('a = ' + problem.a + ' cm', x + a/2 - 30, y - 10);
+    ctx.fillText('h = ' + problem.h + ' cm', x - 50, y + h/2);
+}
+
+// Draw Rhombus
+function drawRhombus() {
+    const canvas = document.getElementById('rhombus-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const problem = getCurrentProblem('rhombus');
+    const scaleFactor = 10;
+    const e = problem.e * scaleFactor;
+    const f = problem.f * scaleFactor;
+    const x = 150, y = 100;
+    
+    // Draw shape
+    ctx.fillStyle = '#ADD8FF';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y - f/2);
+    ctx.lineTo(x + e/2, y);
+    ctx.lineTo(x, y + f/2);
+    ctx.lineTo(x - e/2, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    
+    // Draw dashed diagonal lines
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    // Horizontal diagonal (e)
+    ctx.beginPath();
+    ctx.moveTo(x - e/2, y);
+    ctx.lineTo(x + e/2, y);
+    ctx.stroke();
+    // Vertical diagonal (f)
+    ctx.beginPath();
+    ctx.moveTo(x, y - f/2);
+    ctx.lineTo(x, y + f/2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Labels
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('e = ' + problem.e + ' cm', x - 35, y + f/2 + 25);
+    ctx.fillText('f = ' + problem.f + ' cm', x + e/2 + 10, y);
+}
+
+// Update problem display
+function updateProblemDisplay(shape) {
+    const problem = getCurrentProblem(shape);
+    
+    if (shape === 'drachen') {
+        document.getElementById('drachen-e').textContent = problem.e;
+        document.getElementById('drachen-f').textContent = problem.f;
+        document.getElementById('drachen-sol-e').textContent = problem.e;
+        document.getElementById('drachen-sol-f').textContent = problem.f;
+        document.getElementById('drachen-sol-product').textContent = problem.e * problem.f;
+        document.getElementById('drachen-sol-answer').textContent = problem.answer;
+        drawDrachen();
+    } else if (shape === 'parallelogramm') {
+        document.getElementById('parallelogramm-a').textContent = problem.a;
+        document.getElementById('parallelogramm-h').textContent = problem.h;
+        document.getElementById('parallelogramm-sol-a').textContent = problem.a;
+        document.getElementById('parallelogramm-sol-h').textContent = problem.h;
+        document.getElementById('parallelogramm-sol-answer').textContent = problem.answer;
+        drawParallelogramm();
+    } else if (shape === 'rhombus') {
+        document.getElementById('rhombus-e').textContent = problem.e;
+        document.getElementById('rhombus-f').textContent = problem.f;
+        document.getElementById('rhombus-sol-e').textContent = problem.e;
+        document.getElementById('rhombus-sol-f').textContent = problem.f;
+        document.getElementById('rhombus-sol-product').textContent = problem.e * problem.f;
+        document.getElementById('rhombus-sol-answer').textContent = problem.answer;
+        drawRhombus();
+    }
+}
+
+// New problem button
+function newProblem(shape) {
+    getNextProblem(shape);
+    updateProblemDisplay(shape);
+    
+    // Clear answer and feedback
+    document.getElementById(shape + '-answer').value = '';
+    document.getElementById(shape + '-result').style.display = 'none';
+    document.getElementById(shape + '-solution').classList.remove('visible');
+}
+
+// Check functions
+function checkDrachen() {
+    const answer = Number(document.getElementById('drachen-answer').value);
+    const correct = getCurrentProblem('drachen').answer;
+    const result = document.getElementById('drachen-result');
+    
+    if (answer === correct) {
+        result.className = 'result correct';
+        result.innerHTML = '✓ Richtig! Super gemacht! 🎉';
+    } else if (answer) {
+        result.className = 'result incorrect';
+        result.innerHTML = '✗ Nicht ganz richtig. Versuche es nochmal!';
+    } else {
+        result.style.display = 'none';
+    }
+}
+
+function checkParallelogramm() {
+    const answer = Number(document.getElementById('parallelogramm-answer').value);
+    const correct = getCurrentProblem('parallelogramm').answer;
+    const result = document.getElementById('parallelogramm-result');
+    
+    if (answer === correct) {
+        result.className = 'result correct';
+        result.innerHTML = '✓ Richtig! Hervorragend! 🎉';
+    } else if (answer) {
+        result.className = 'result incorrect';
+        result.innerHTML = '✗ Nicht ganz richtig. Versuche es nochmal!';
+    } else {
+        result.style.display = 'none';
+    }
+}
+
+function checkRhombus() {
+    const answer = Number(document.getElementById('rhombus-answer').value);
+    const correct = getCurrentProblem('rhombus').answer;
+    const result = document.getElementById('rhombus-result');
+    
+    if (answer === correct) {
+        result.className = 'result correct';
+        result.innerHTML = '✓ Richtig! Fantastisch! 🎉';
+    } else if (answer) {
+        result.className = 'result incorrect';
+        result.innerHTML = '✗ Nicht ganz richtig. Versuche es nochmal!';
+    } else {
+        result.style.display = 'none';
+    }
+}
+
+function toggleSolution(shape) {
+    const solution = document.getElementById(shape + '-solution');
+    solution.classList.toggle('visible');
+}
+
+// Allow Enter key to submit
+document.getElementById('drachen-answer').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') checkDrachen();
+});
+document.getElementById('parallelogramm-answer').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') checkParallelogramm();
+});
+document.getElementById('rhombus-answer').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') checkRhombus();
+});
+
+// Initialize drawings on page load
+drawDrachen();
+drawParallelogramm();
+drawRhombus();
+</script>
+
+</body>
+</html>

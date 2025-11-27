@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Rhombus – Zerlegung wie GeoGebra</title>
 <link rel="stylesheet" href="shared.css">
+<script src="quiz-data.js"></script>
 </head>
 <body>
 
@@ -149,6 +150,154 @@ function drawPolygon(pts) {
 
 slider.oninput = draw;
 draw();
+</script>
+
+<!-- Quiz Section -->
+<div style="max-width: 800px; margin: 60px auto 40px; padding: 0 20px;">
+    <h2 style="color: #333; margin-bottom: 20px;">🧮 Quiz: Berechne die Fläche!</h2>
+    
+    <div style="background: white; border: 2px solid #333; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin: 20px 0;">
+            <canvas id="rhombus-quiz-canvas" width="300" height="200"></canvas>
+        </div>
+        
+        <div style="background: #f0f0f0; padding: 15px; border-radius: 4px; margin: 20px 0; font-size: 18px; line-height: 1.8;">
+            <strong>Gegeben:</strong><br>
+            Diagonale e = <span id="rhombus-e">10</span> cm<br>
+            Diagonale f = <span id="rhombus-f">14</span> cm
+        </div>
+        
+        <div style="background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; font-style: italic; color: #666;">
+            💡 Tipp: Die Formel für die Fläche eines Rhombus lautet: A = (e × f) / 2
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0; flex-wrap: wrap;">
+                <label for="rhombus-answer" style="font-size: 18px; font-weight: bold;">Deine Antwort:</label>
+                <input type="number" id="rhombus-answer" placeholder="z.B. 70" style="padding: 10px; font-size: 18px; border: 2px solid #333; border-radius: 4px; width: 150px;">
+                <span style="font-size: 18px;">cm²</span>
+                <button onclick="checkRhombusQuiz()" style="padding: 12px 30px; font-size: 18px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Prüfen</button>
+            </div>
+            
+            <div id="rhombus-result" style="display: none; margin-top: 15px; padding: 15px; border-radius: 4px; font-size: 18px; font-weight: bold;"></div>
+            
+            <button onclick="toggleRhombusSolution()" style="margin-top: 10px; padding: 10px 20px; font-size: 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Lösung anzeigen</button>
+            <button onclick="newRhombusProblem()" style="margin-top: 10px; margin-left: 10px; padding: 10px 25px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Neue Aufgabe</button>
+            
+            <div id="rhombus-solution" style="display: none; background: #e7f3ff; border-left: 4px solid #0050FF; padding: 15px; margin-top: 15px; line-height: 1.8;">
+                <strong>Lösung:</strong><br>
+                A = (e × f) / 2<br>
+                A = (<span id="rhombus-sol-e">10</span> cm × <span id="rhombus-sol-f">14</span> cm) / 2<br>
+                A = <span id="rhombus-sol-product">140</span> cm² / 2<br>
+                A = <strong><span id="rhombus-sol-answer">70</span> cm²</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize quiz for rhombus
+currentProblems.rhombus = 0;
+
+function drawRhombusQuiz() {
+    const canvas = document.getElementById('rhombus-quiz-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const problem = getCurrentProblem('rhombus');
+    const scaleFactor = 10;
+    const e = problem.e * scaleFactor;
+    const f = problem.f * scaleFactor;
+    const x = 150, y = 100;
+    
+    // Draw shape
+    ctx.fillStyle = '#ADD8FF';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y - f/2);
+    ctx.lineTo(x + e/2, y);
+    ctx.lineTo(x, y + f/2);
+    ctx.lineTo(x - e/2, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    
+    // Draw dashed diagonal lines
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    // Horizontal diagonal (e)
+    ctx.beginPath();
+    ctx.moveTo(x - e/2, y);
+    ctx.lineTo(x + e/2, y);
+    ctx.stroke();
+    // Vertical diagonal (f)
+    ctx.beginPath();
+    ctx.moveTo(x, y - f/2);
+    ctx.lineTo(x, y + f/2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Labels
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('e = ' + problem.e + ' cm', x - 35, y + f/2 + 25);
+    ctx.fillText('f = ' + problem.f + ' cm', x + e/2 + 10, y);
+}
+
+function updateRhombusQuizDisplay() {
+    const problem = getCurrentProblem('rhombus');
+    document.getElementById('rhombus-e').textContent = problem.e;
+    document.getElementById('rhombus-f').textContent = problem.f;
+    document.getElementById('rhombus-sol-e').textContent = problem.e;
+    document.getElementById('rhombus-sol-f').textContent = problem.f;
+    document.getElementById('rhombus-sol-product').textContent = problem.e * problem.f;
+    document.getElementById('rhombus-sol-answer').textContent = problem.answer;
+    drawRhombusQuiz();
+}
+
+function newRhombusProblem() {
+    getNextProblem('rhombus');
+    updateRhombusQuizDisplay();
+    document.getElementById('rhombus-answer').value = '';
+    document.getElementById('rhombus-result').style.display = 'none';
+    document.getElementById('rhombus-solution').style.display = 'none';
+}
+
+function checkRhombusQuiz() {
+    const answer = Number(document.getElementById('rhombus-answer').value);
+    const correct = getCurrentProblem('rhombus').answer;
+    const result = document.getElementById('rhombus-result');
+    
+    if (answer === correct) {
+        result.style.display = 'block';
+        result.style.background = '#d4edda';
+        result.style.color = '#155724';
+        result.style.border = '2px solid #28a745';
+        result.innerHTML = '✓ Richtig! Fantastisch! 🎉';
+    } else if (answer) {
+        result.style.display = 'block';
+        result.style.background = '#f8d7da';
+        result.style.color = '#721c24';
+        result.style.border = '2px solid #dc3545';
+        result.innerHTML = '✗ Nicht ganz richtig. Versuche es nochmal!';
+    } else {
+        result.style.display = 'none';
+    }
+}
+
+function toggleRhombusSolution() {
+    const solution = document.getElementById('rhombus-solution');
+    solution.style.display = solution.style.display === 'none' ? 'block' : 'none';
+}
+
+document.getElementById('rhombus-answer').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') checkRhombusQuiz();
+});
+
+// Initialize quiz
+drawRhombusQuiz();
 </script>
 
 </body>

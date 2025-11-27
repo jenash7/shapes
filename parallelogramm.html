@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Parallelogramm – Zerlegung wie GeoGebra</title>
 <link rel="stylesheet" href="shared.css">
+<script src="quiz-data.js"></script>
 </head>
 <body>
 
@@ -124,6 +125,152 @@ function drawPolygon(pts) {
 
 slider.oninput = draw;
 draw();
+</script>
+
+<!-- Quiz Section -->
+<div style="max-width: 800px; margin: 60px auto 40px; padding: 0 20px;">
+    <h2 style="color: #333; margin-bottom: 20px;">🧮 Quiz: Berechne die Fläche!</h2>
+    
+    <div style="background: white; border: 2px solid #333; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin: 20px 0;">
+            <canvas id="parallelogramm-quiz-canvas" width="300" height="200"></canvas>
+        </div>
+        
+        <div style="background: #f0f0f0; padding: 15px; border-radius: 4px; margin: 20px 0; font-size: 18px; line-height: 1.8;">
+            <strong>Gegeben:</strong><br>
+            Grundseite a = <span id="parallelogramm-a">15</span> cm<br>
+            Höhe h = <span id="parallelogramm-h">6</span> cm
+        </div>
+        
+        <div style="background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; font-style: italic; color: #666;">
+            💡 Tipp: Die Formel für die Fläche eines Parallelogramms lautet: A = a × h
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin: 15px 0; flex-wrap: wrap;">
+                <label for="parallelogramm-answer" style="font-size: 18px; font-weight: bold;">Deine Antwort:</label>
+                <input type="number" id="parallelogramm-answer" placeholder="z.B. 90" style="padding: 10px; font-size: 18px; border: 2px solid #333; border-radius: 4px; width: 150px;">
+                <span style="font-size: 18px;">cm²</span>
+                <button onclick="checkParallelogrammQuiz()" style="padding: 12px 30px; font-size: 18px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">Prüfen</button>
+            </div>
+            
+            <div id="parallelogramm-result" style="display: none; margin-top: 15px; padding: 15px; border-radius: 4px; font-size: 18px; font-weight: bold;"></div>
+            
+            <button onclick="toggleParallelogrammSolution()" style="margin-top: 10px; padding: 10px 20px; font-size: 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Lösung anzeigen</button>
+            <button onclick="newParallelogrammProblem()" style="margin-top: 10px; margin-left: 10px; padding: 10px 25px; font-size: 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Neue Aufgabe</button>
+            
+            <div id="parallelogramm-solution" style="display: none; background: #e7f3ff; border-left: 4px solid #0050FF; padding: 15px; margin-top: 15px; line-height: 1.8;">
+                <strong>Lösung:</strong><br>
+                A = a × h<br>
+                A = <span id="parallelogramm-sol-a">15</span> cm × <span id="parallelogramm-sol-h">6</span> cm<br>
+                A = <strong><span id="parallelogramm-sol-answer">90</span> cm²</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize quiz for parallelogramm
+currentProblems.parallelogramm = 0;
+
+function drawParallelogrammQuiz() {
+    const canvas = document.getElementById('parallelogramm-quiz-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const problem = getCurrentProblem('parallelogramm');
+    const scaleFactor = 10;
+    const a = problem.a * scaleFactor;
+    const h = problem.h * scaleFactor;
+    const skew = 30;
+    const x = 75, y = 70;
+    
+    // Draw shape
+    ctx.fillStyle = '#ADD8FF';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + a, y);
+    ctx.lineTo(x + a - skew, y + h);
+    ctx.lineTo(x - skew, y + h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    
+    // Draw dashed height line
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + h);
+    ctx.stroke();
+    // Draw dashed baseline extension
+    ctx.beginPath();
+    ctx.moveTo(x - skew, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Labels
+    ctx.font = '16px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText('a = ' + problem.a + ' cm', x + a/2 - 30, y - 10);
+    ctx.fillText('h = ' + problem.h + ' cm', x - 50, y + h/2);
+}
+
+function updateParallelogrammQuizDisplay() {
+    const problem = getCurrentProblem('parallelogramm');
+    document.getElementById('parallelogramm-a').textContent = problem.a;
+    document.getElementById('parallelogramm-h').textContent = problem.h;
+    document.getElementById('parallelogramm-sol-a').textContent = problem.a;
+    document.getElementById('parallelogramm-sol-h').textContent = problem.h;
+    document.getElementById('parallelogramm-sol-answer').textContent = problem.answer;
+    drawParallelogrammQuiz();
+}
+
+function newParallelogrammProblem() {
+    getNextProblem('parallelogramm');
+    updateParallelogrammQuizDisplay();
+    document.getElementById('parallelogramm-answer').value = '';
+    document.getElementById('parallelogramm-result').style.display = 'none';
+    document.getElementById('parallelogramm-solution').style.display = 'none';
+}
+
+function checkParallelogrammQuiz() {
+    const answer = Number(document.getElementById('parallelogramm-answer').value);
+    const correct = getCurrentProblem('parallelogramm').answer;
+    const result = document.getElementById('parallelogramm-result');
+    
+    if (answer === correct) {
+        result.style.display = 'block';
+        result.style.background = '#d4edda';
+        result.style.color = '#155724';
+        result.style.border = '2px solid #28a745';
+        result.innerHTML = '✓ Richtig! Hervorragend! 🎉';
+    } else if (answer) {
+        result.style.display = 'block';
+        result.style.background = '#f8d7da';
+        result.style.color = '#721c24';
+        result.style.border = '2px solid #dc3545';
+        result.innerHTML = '✗ Nicht ganz richtig. Versuche es nochmal!';
+    } else {
+        result.style.display = 'none';
+    }
+}
+
+function toggleParallelogrammSolution() {
+    const solution = document.getElementById('parallelogramm-solution');
+    solution.style.display = solution.style.display === 'none' ? 'block' : 'none';
+}
+
+document.getElementById('parallelogramm-answer').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') checkParallelogrammQuiz();
+});
+
+// Initialize quiz
+drawParallelogrammQuiz();
 </script>
 
 </body>
