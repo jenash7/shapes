@@ -6,6 +6,7 @@
 <title>Parallelogramm – Zerlegung wie GeoGebra</title>
 <link rel="stylesheet" href="shared.css">
 <script src="quiz-data.js"></script>
+<script src="common-utils.js"></script>
 </head>
 <body>
 
@@ -159,165 +160,6 @@ draw();
 </script>
 
 <!-- Quiz Section -->
-<style>
-.quiz-section {
-    max-width: 800px;
-    margin: 60px auto 40px;
-    padding: 0 20px;
-}
-
-.quiz-card {
-    background: white;
-    border: 2px solid #333;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.quiz-canvas-container {
-    text-align: center;
-    margin: 20px 0;
-    overflow-x: auto;
-}
-
-.quiz-canvas-container canvas {
-    max-width: 100%;
-    height: auto;
-}
-
-.quiz-dimensions {
-    background: #f0f0f0;
-    padding: 15px;
-    border-radius: 4px;
-    margin: 20px 0;
-    font-size: 18px;
-    line-height: 1.8;
-}
-
-.quiz-hint {
-    background: #fff9e6;
-    border-left: 4px solid #ffc107;
-    padding: 15px;
-    margin: 20px 0;
-    font-style: italic;
-    color: #666;
-}
-
-.quiz-answer-section {
-    margin: 20px 0;
-}
-
-.quiz-input-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 15px 0;
-    flex-wrap: wrap;
-}
-
-.quiz-input-group label {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.quiz-input-group input {
-    padding: 10px;
-    font-size: 18px;
-    border: 2px solid #333;
-    border-radius: 4px;
-    width: 150px;
-    max-width: 100%;
-}
-
-.quiz-btn {
-    padding: 12px 30px;
-    font-size: 18px;
-    background: #333;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 5px 5px 5px 0;
-}
-
-.quiz-btn:hover {
-    opacity: 0.9;
-}
-
-.quiz-btn-secondary {
-    padding: 10px 20px;
-    font-size: 16px;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 5px 5px 5px 0;
-}
-
-.quiz-btn-success {
-    padding: 10px 25px;
-    font-size: 16px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin: 5px 5px 5px 0;
-}
-
-.quiz-result {
-    display: none;
-    margin-top: 15px;
-    padding: 15px;
-    border-radius: 4px;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.quiz-solution {
-    display: none;
-    background: #e7f3ff;
-    border-left: 4px solid #0050FF;
-    padding: 15px;
-    margin-top: 15px;
-    line-height: 1.8;
-}
-
-@media (max-width: 768px) {
-    .quiz-card {
-        padding: 20px;
-    }
-    
-    .quiz-dimensions,
-    .quiz-hint {
-        font-size: 16px;
-    }
-    
-    .quiz-input-group {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .quiz-input-group input {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .quiz-btn {
-        width: 100%;
-        max-width: 300px;
-    }
-    
-    .quiz-btn-secondary,
-    .quiz-btn-success {
-        width: 100%;
-        max-width: 300px;
-        margin: 5px 0;
-    }
-}
-</style>
-
 <div class="quiz-section">
     <h2 style="color: #333; margin-bottom: 20px;">🧮 Quiz: Berechne die Fläche!</h2>
     
@@ -436,45 +278,20 @@ window.addEventListener('resize', function() {
 });
 
 function newParallelogrammProblem() {
-    getNextProblem('parallelogramm');
-    updateParallelogrammQuizDisplay();
-    document.getElementById('parallelogramm-answer').value = '';
-    document.getElementById('parallelogramm-result').style.display = 'none';
-    document.getElementById('parallelogramm-solution').style.display = 'none';
+    newQuizProblem('parallelogramm', updateParallelogrammQuizDisplay);
 }
 
 function checkParallelogrammQuiz() {
-    const answer = Number(document.getElementById('parallelogramm-answer').value);
     const correct = getCurrentProblem('parallelogramm').answer;
-    const result = document.getElementById('parallelogramm-result');
-    
-    if (answer === correct) {
-        result.style.display = 'block';
-        result.style.background = '#d4edda';
-        result.style.color = '#155724';
-        result.style.border = '2px solid #28a745';
-        result.innerHTML = '✓ Richtig! Hervorragend! 🎉';
-    } else if (answer) {
-        result.style.display = 'block';
-        result.style.background = '#f8d7da';
-        result.style.color = '#721c24';
-        result.style.border = '2px solid #dc3545';
-        result.innerHTML = '✗ Nicht ganz richtig. Versuche es nochmal!';
-    } else {
-        result.style.display = 'none';
-    }
+    checkQuizAnswer('parallelogramm', correct);
 }
 
 function toggleParallelogrammSolution() {
-    const solution = document.getElementById('parallelogramm-solution');
-    solution.style.display = solution.style.display === 'none' ? 'block' : 'none';
+    toggleQuizSolution('parallelogramm');
 }
 
-document.getElementById('parallelogramm-answer').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') checkParallelogrammQuiz();
-});
-
 // Initialize quiz
+setupQuizEnterKey('parallelogramm', checkParallelogrammQuiz);
 drawParallelogrammQuiz();
 </script>
 
